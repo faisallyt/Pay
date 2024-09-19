@@ -10,6 +10,15 @@ const transaction = async (req, res) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
+    if (receiver === userId) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Invalid Operation" });
+    }
+
+    if (amount <= 0) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: "Invalid Amount" });
+    }
     const senderUser = await User.findById(userId).session(session);
     if (!senderUser) {
       await session.abortTransaction();
