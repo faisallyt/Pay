@@ -1,7 +1,7 @@
 const { User } = require("../../schema/User");
 
 const fetchUser = async (req, res) => {
-  const query = req.query.filter;
+  const query = req.query.filter || "";
   try {
     const users = await User.find({
       $or: [
