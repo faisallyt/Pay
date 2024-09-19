@@ -1,14 +1,19 @@
+const { Account } = require("../../schema/Account");
 const { User } = require("../../schema/User");
 
 const fetchUser = async (req, res) => {
   const query = req.query.filter || "";
   try {
-    const users = await User.find({
-      $or: [
-        { firstName: new RegExp(query, "i") },
-        { lastName: new RegExp(query, "i") },
-      ],
-    });
+    const users = await User.find(
+      {
+        $or: [
+          { firstName: new RegExp(query, "i") },
+          { lastName: new RegExp(query, "i") },
+        ],
+      },
+      { password: 0 }
+    );
+
     if (users.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }

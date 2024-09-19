@@ -2,6 +2,7 @@ const zod = require("zod");
 const { User } = require("../../schema/User.js");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../../config.js");
+const { Account } = require("../../schema/Account.js");
 const signupSchema = zod.object({
   username: zod.string(),
   firstName: zod.string(),
@@ -29,6 +30,11 @@ const signupController = async (req, res) => {
   body.isActive = true;
   const createdUser = await User.create(body);
 
+  await Account.create({
+    userId: createdUser._id,
+    balance: 1 + Math.random() * 10000,
+  });
+
   const token = jwt.sign(
     {
       userId: createdUser._id,
@@ -36,9 +42,11 @@ const signupController = async (req, res) => {
     JWT_SECRET
   );
 
+  const { password, ...userWithoutPassword } = body;
+
   return res.json({
     message: "User registered successfully",
-    user: body,
+    user: userWithoutPassword,
     token: token,
   });
 };
